@@ -60,7 +60,7 @@ jobs:
         run: |
           docker build \
             --build-arg VITE_API_URL=http://44.213.121.118:30893 \
-            -t tomidedev/zurimarket-frontend:latest .
+            -t tomidedev/zurimarket-frontend:v1 .
 
       # ==========================================
       # PUSH IMAGE
