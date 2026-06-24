@@ -58,7 +58,9 @@ jobs:
       # ==========================================
       - name: Build Docker Image
         run: |
-          docker build -t tomidedev/zurimarket-frontend:v1 .
+          docker build \
+            --build-arg VITE_API_URL=${{ secrets.FRONTEND_API_URL }} \
+            -t tomidedev/zurimarket-frontend:v1 .
 
       # ==========================================
       # PUSH IMAGE
