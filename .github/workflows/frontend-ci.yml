@@ -65,7 +65,7 @@ jobs:
       # ==========================================
       - name: Push Docker Image
         run: |
-          docker push tomidedev/zurimarket-frontend:latest
+          docker push tomidedev/zurimarket-frontend:v1
 
       # ==========================================
       # CONFIGURE KUBECONFIG
