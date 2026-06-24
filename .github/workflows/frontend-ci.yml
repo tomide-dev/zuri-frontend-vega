@@ -74,6 +74,13 @@ jobs:
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG_DATA }}" > ~/.kube/config
+      
+      # ==========================================
+      # CREATE NAMESPACE
+      # ==========================================    
+      - name: Create Namespace
+        run: |
+          kubectl apply -f k8s/namespace.yaml    
 
       # ==========================================
       # DEPLOY FRONTEND
