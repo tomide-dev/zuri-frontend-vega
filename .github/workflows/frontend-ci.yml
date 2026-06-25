@@ -60,14 +60,14 @@ jobs:
         run: |
           docker build \
             --build-arg VITE_API_URL=${{ secrets.FRONTEND_API_URL }} \
-            -t tomidedev/zurimarket-frontend:v1 .
+            -t tomidedev/zurimarket-frontend:latest .
 
       # ==========================================
       # PUSH IMAGE
       # ==========================================
       - name: Push Docker Image
         run: |
-          docker push tomidedev/zurimarket-frontend:v1
+          docker push tomidedev/zurimarket-frontend:latest
 
       # ==========================================
       # CONFIGURE KUBECONFIG

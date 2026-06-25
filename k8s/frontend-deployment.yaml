@@ -21,7 +21,7 @@ spec:
       containers:
         - name: frontend
 
-          image: tomidedev/zurimarket-frontend:v1
+          image: tomidedev/zurimarket-frontend:latest
 
           imagePullPolicy: Always
 
