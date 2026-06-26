@@ -85,7 +85,7 @@ cp .env.example .env
 ```bash
 # 1. Clone the repo
 git clone https://github.com/tomide-dev/zuri-frontend-vega.git
-cd zuri-market-orion-frontend
+cd zuriapp-frontend
 
 # 2. Install dependencies
 npm install
