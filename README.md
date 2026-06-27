@@ -118,12 +118,6 @@ npm run preview
 
 ## 7. Docker
 
-The `Dockerfile` uses a two-stage build:
-
-# demo v1
-1. **Build stage** — `node:20-alpine`. Installs dependencies with `npm ci`, accepts `VITE_API_URL` as a build argument, and runs `npm run build`.
-2. **Runtime stage** — `nginx:alpine`. Copies only the `dist/` output from the build stage and serves it on port `80`.
-
 ```bash
 docker build -t tomidedev/zuriapp-frontend .
 docker run -p 3000:80 tomidedev/zuriapp-frontend
