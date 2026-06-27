@@ -125,7 +125,7 @@ docker run -p 3000:80 tomidedev/zuriapp-frontend
 
 Docker Hub image: **`tomidedev/zuriapp-frontend`**
 
-> In the CI/CD pipeline, `VITE_API_URL` is set to the backend's NodePort address on the EC2 host (`http://<EC2_PUBLIC_IP>:30080`) at build time, since `VITE_API_URL` gets baked into the static bundle — it can't be changed after the image is built.
+> In the CI/CD pipeline, `VITE_API_URL` is set to the backend's NodePort address on the EC2 host (`http://<EC2_PUBLIC_IP>:30080`) at build time, since `VITE_API_URL` gets baked into the static bundle — it can't be changed after the image is built..
 
 ## 8. Component Reference
 
