@@ -125,15 +125,67 @@ docker run -p 3000:80 tomidedev/zuriapp-frontend
 
 Docker Hub image: **`tomidedev/zuriapp-frontend`**
 
-> In the CI/CD pipeline, `VITE_API_URL` is set to the backend's NodePort address on the EC2 host (`http://<EC2_PUBLIC_IP>:30080`) at build time, since `VITE_API_URL` gets baked into the static bundle — it can't be changed after the image is built..
+> In the CI/CD pipeline, `VITE_API_URL` is set to the backend's NodePort address on the EC2 host (`http://<EC2_PUBLIC_IP>:30080`) at build time, since `VITE_API_URL` gets baked into the static bundle — it can't be changed after the image is built.
 
-## 8. Component Reference
+## 8. Deployment
 
-| Component | Renders | Receives (props) |
-|---|---|---|
-| `Navbar` | Store name + nav links + cart button with item badge | `storeName`, `cartCount`, `onCartOpen` |
-| `Hero` | Landing banner with headline and CTA buttons | `storeName` |
-| `FilterBar` | Category filter pills | `activeCategory`, `onCategoryChange` |
-| `ProductGrid` | Product card grid, loading skeletons, error message, or empty state | `products`, `loading`, `error`, `onAddToCart` |
-| `ProductCard` | Single product: image, category, name, description, price, add-to-cart button | `product`, `onAddToCart` |
-| `CartSidebar` | Slide-out panel: cart line items, quantity steppers, subtotal, checkout/clear buttons | `cartItems`, `cartTotal`, `onRemove`, `onUpdateQuantity`, `onClear`, `onClose` |
+The underlying k3s cluster and supporting AWS infrastructure (EC2 instance, IAM roles, Secrets Manager entries, etc.) are provisioned with **Terraform**. 
+
+The provisioning code lives in [Zuri Market - Infrastructure](https://github.com/tomide-dev/zuri-market-vega-infra.git) — refer to it for setup and teardown instructions; this README only covers the application deployment itself.
+
+Deployment is fully automated via **GitHub Actions** (`.github/workflows/frontend-ci.yml`) using two jobs. On every push to `main`, the pipeline installs dependencies, runs tests and `npm audit`, builds the Docker image, and if the scan passes it pushes the image to Docker Hub and rolls it out to the **k3s** cluster running on the EC2 Instance.
+
+Edit this file as well as your **Kubernetes Manifests** (`.k8s/frontend-deployment.yaml`) to match your configurations
+
+The frontend Service is exposed via Kubernetes NodePort on port 30080, making the app reachable externally at:
+
+`http://<EC2_PUBLIC_IP>:30080`
+
+### Push to your remote GitHub Repo
+
+You now have everything in place. Commit the entire application code to your GitHub repo and push everything to main. This is what triggers the first full deployment.
+
+```bash
+git add .
+git commit -m "Your_Commit_Message"
+git push origin main
+```
+From this point on, every push to main triggers the full pipeline automatically.
+
+Once the pipeline runs successfully, verify the deployment from your EC2 Instance:
+
+```bash
+kubectl get pods -n zurimarket      
+# both backend and frontend pods should show Running
+kubectl get services   
+# confirm frontend-service shows nodePort 30080
+# and backend-service shows nodePort 30893
+```
+
+## 9. Secrets
+
+Secrets are sourced differently depending on where the app is running:
+
+- **Locally** — secrets come from your own `.env` file (created from `.env.example`), and are never committed to the repo.
+- **In the CI/CD pipeline** — secrets used to build, scan, and push the image, and then deploy to the k3s cluster on AWS (e.g. `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `EC2_PUBLIC_IP`, `SSH_PRIVATE_KEY`, `KUBECONFIG_DATA`) are stored as **GitHub Actions Secrets** and injected into the workflow at runtime — they're never hardcoded in the YAML.
+- **In production** — the actual application secrets (`API_SECRET_KEY`, `STORE_NAME`) are stored in **AWS Secrets Manager**. 
+
+## 10. Final Project Expectation
+
+You should be able to Access the live App at `http://44.213.121.118:30080` as shown below
+
+![Live App](zuri-market-final-deployment-image.PNG)
+
+### Overall Project Recommendation 
+
+| Improvement | Why it matters |
+|---|---|
+| Multi-environment pipeline with dev, staging, and production | All changes currently go directly to production on every push to main. A dev → staging → prod promotion model with environment-scoped GitHub Secrets means changes are validated in a lower environment before reaching real users. |
+| Add HTTPS and TLS across all services end to end | All traffic currently travels over plain HTTP between the user and the frontend, and between the frontend and the backend API. HTTPS is non-negotiable for production: it protects data in transit, is required for modern browser APIs, and is expected by users. |
+| Deploy a logging, monitoring, and alerting solution (ELK stack, CloudWatch or Prometheus + Grafana) | There is currently no visibility into pod health, API response times, error rates, or resource usage after deployment. Without monitoring you are blind to problems until users report them. CloudWatch or a Prometheus/Grafana stack surfaces issues proactively. |
+
+The recommendations above are not exhaustive but represent a solid foundation for evolving the project into a production-ready solution that adheres to modern DevOps principles, security standards, scalability requirements, and engineering best practices.
+
+---
+
+*Author [Tomide Olubanjo](linkedin.com/in/oluwatomide-olubanjo)*
