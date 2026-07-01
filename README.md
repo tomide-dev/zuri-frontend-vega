@@ -133,7 +133,7 @@ The underlying k3s cluster and supporting AWS infrastructure (EC2 instance, IAM 
 
 The provisioning code lives in [Zuri Market - Infrastructure](https://github.com/tomide-dev/zuri-market-vega-infra.git) — refer to it for setup and teardown instructions; this README only covers the application deployment itself.
 
-Deployment is fully automated via **GitHub Actions** (`.github/workflows/frontend-ci.yml`) using two jobs. On every push to `main`, the pipeline installs dependencies, runs tests and `npm audit`, builds the Docker image, and if the scan passes it pushes the image to Docker Hub and rolls it out to the **k3s** cluster running on the EC2 Instance.
+Deployment is fully automated via **GitHub Actions** (`.github/workflows/frontend-ci.yml`) using two jobs. On every push to `main`, the pipeline installs dependencies, runs tests and `npm audit`, and if the scan passes builds the Docker image, it pushes the image to Docker Hub and rolls it out to the **k3s** cluster running on the EC2 Instance.
 
 Edit this file as well as your **Kubernetes Manifests** (`.k8s/frontend-deployment.yaml`) to match your configurations
 
